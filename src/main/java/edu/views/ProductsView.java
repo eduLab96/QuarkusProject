@@ -22,7 +22,6 @@ import java.util.List;
 
 @PageTitle("Products")
 @Route(value = "products", layout = MainLayout.class)
-@RouteAlias(value = "", layout = MainLayout.class)
 public class ProductsView extends VerticalLayout {
 
     ApiRequests api;

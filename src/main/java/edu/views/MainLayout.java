@@ -55,10 +55,11 @@ public class MainLayout extends AppLayout implements AppShellConfigurator {
 
     private SideNav createNavigation() {
         SideNav nav = new SideNav();
-
+        
+        nav.addItem(new SideNavItem("Intro", IntroView.class,VaadinIcon.COFFEE.create()));
         nav.addItem(new SideNavItem("Products", ProductsView.class,VaadinIcon.DATABASE.create()));
         nav.addItem(new SideNavItem("About", AboutView.class,VaadinIcon.ACADEMY_CAP.create()));
-
+        
         return nav;
     }
 
