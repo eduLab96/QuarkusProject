@@ -14,6 +14,7 @@ public class Product implements Serializable {
     private int Id;
     private String name;
     private String description;
+    private boolean isAvaliable;
 
     public Product() {};
 
@@ -21,6 +22,13 @@ public class Product implements Serializable {
         Id = id;
         this.name = name;
         this.description = description;
+    }
+    
+    public Product(int id, String name, String description, boolean isAvaliable) {
+        Id = id;
+        this.name = name;
+        this.description = description;
+        this.isAvaliable = isAvaliable;
     }
 
     public Product(String name, String description) {
@@ -47,4 +55,13 @@ public class Product implements Serializable {
         this.description = description;
     }
 
+	public boolean isAvaliable() {
+		return isAvaliable;
+	}
+
+	public void setAvaliable(boolean isAvaliable) {
+		this.isAvaliable = isAvaliable;
+	}
+
+    
 }

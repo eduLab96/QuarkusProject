@@ -34,6 +34,16 @@ public class ProductRepository {
         String hql = "SELECT p FROM Product p";
         return em.createQuery(hql).getResultList();
     }
+    
+    @SuppressWarnings("unchecked")
+    @Transactional
+    public List<Product> listProductsGrid(int offset, int limit){
+        String hql = "SELECT p FROM Product p";
+        return em.createQuery(hql)
+        		.setFirstResult(offset)
+        		.setMaxResults(limit)
+        		.getResultList();
+    }
 
     @Transactional
     public Product getProductById(int id) {
