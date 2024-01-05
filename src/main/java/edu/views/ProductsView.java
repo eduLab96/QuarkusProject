@@ -2,8 +2,11 @@ package edu.views;
 
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.checkbox.Checkbox;
+import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
+import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
@@ -11,14 +14,13 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-import com.vaadin.flow.router.RouteAlias;
 import edu.api.ApiRequests;
 import edu.entities.Product;
 import com.vaadin.flow.theme.lumo.LumoUtility.Gap;
 import jakarta.inject.Inject;
-import java.util.List;
 
 @PageTitle("Products")
 @Route(value = "products", layout = MainLayout.class)
@@ -71,7 +73,7 @@ public class ProductsView extends VerticalLayout {
         deleteButton = new Button();
         deleteButton.setText("Delete");
         deleteButton.addThemeVariants(ButtonVariant.LUMO_ERROR);
-        deleteButton.addClickListener(click -> deleteProduct());
+        deleteButton.addClickListener(click -> showDeleteDialog());
 
         cancelButton = new Button();
         cancelButton.setText("Cancel");
@@ -115,13 +117,35 @@ public class ProductsView extends VerticalLayout {
         layoutColumn3.add(grid);
         
     }
+    
+    private void showDeleteDialog() {
+    	
+    	ConfirmDialog dialog = new ConfirmDialog();
+    	dialog.setHeader("Delete product?");
+    	dialog.setText(
+    	        "Are you sure you want to permanently delete this item?");
 
-    private void refreshGrid() {
-        List<Product> products;
-        products = api.requestProductList();
-        grid.setItems(products);
+    	dialog.setCancelable(true);
+
+    	dialog.setConfirmText("Delete");
+    	dialog.setConfirmButtonTheme("error primary");
+    	dialog.addConfirmListener(event -> deleteProduct());
+    	
+	    dialog.open();
+    	
     }
 
+   
+    
+    private void loadGrid() {
+    	grid.setItems(query -> 
+    		api.requestProductListQuery(
+                    query.getOffset(),
+                    query.getLimit() 
+                )
+                .stream());
+    }
+    
     private void addProduct() {
         Product p = new Product(addNameField.getValue(),addDescriptionField.getValue());
         if (!api.requestPostProduct(p)) {
@@ -130,7 +154,7 @@ public class ProductsView extends VerticalLayout {
         }
         addNameField.setValue("");
         addDescriptionField.setValue("");
-        refreshGrid();
+        loadGrid();
         Notification.show("Product added");
     }
 
@@ -148,12 +172,12 @@ public class ProductsView extends VerticalLayout {
             Notification.show("Couldn't upload the product")
                     .addThemeVariants(NotificationVariant.LUMO_ERROR);
         }
-        refreshGrid();
+        loadGrid();
     }
 
     private void deleteProduct() {
-
-        if (idField.getValue() == null) {
+    	
+		if (idField.getValue() == null) {
             Notification.show("Id is empty")
                     .addThemeVariants(NotificationVariant.LUMO_ERROR);
         }
@@ -167,7 +191,8 @@ public class ProductsView extends VerticalLayout {
             Notification.show("Couldn't delete the product")
                     .addThemeVariants(NotificationVariant.LUMO_ERROR);
         }
-        refreshGrid();
+        loadGrid();
+   
     }
 
 
@@ -185,11 +210,26 @@ public class ProductsView extends VerticalLayout {
 
     private void createGrid(){
         grid = new Grid<>(Product.class, false);
-        grid.addThemeVariants(GridVariant.LUMO_COMPACT, GridVariant.LUMO_NO_BORDER,
-                GridVariant.LUMO_NO_ROW_BORDERS);
-        grid.addColumn(Product::getId).setHeader("Id");
-        grid.addColumn(Product::getName).setHeader("Name");
-        grid.addColumn(Product::getDescription).setHeader("Description");
+        grid.setSelectionMode(Grid.SelectionMode.SINGLE);
+        grid.addThemeVariants(
+        		GridVariant.LUMO_COMPACT, 
+        		GridVariant.LUMO_NO_BORDER,
+                GridVariant.LUMO_NO_ROW_BORDERS
+                );
+        grid.addColumn(Product::getId).setHeader("Id").setSortable(true);
+        grid.addColumn(Product::getName).setHeader("Name").setSortable(true);
+        grid.addColumn(Product::getDescription).setHeader("Description").setSortable(true);
+        
+        grid.addComponentColumn(Product -> {
+        	  Checkbox checkbox = new Checkbox();
+        	  checkbox.setValue(Product.isAvaliable());
+        	  checkbox.setReadOnly(true);
+        	  return checkbox;
+        	})
+        .setHeader("Is avaliable?")
+        .setSortable(true);
+        
+        
         grid.asSingleSelect().addValueChangeListener(event -> {
             if (event.getValue() != null) {
                 Product p = event.getValue();
@@ -198,9 +238,8 @@ public class ProductsView extends VerticalLayout {
                 clearForm();
             }
         });
-        grid.setId("Grid");
         grid.setColumnReorderingAllowed(true);
-        refreshGrid();
+        loadGrid();
     }
 
     public void setIdField(int id) {

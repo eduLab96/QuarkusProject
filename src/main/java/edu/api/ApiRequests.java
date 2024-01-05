@@ -28,11 +28,12 @@ public class ApiRequests {
         this.objectMapper = om;
     }
 
-    public List<Product> requestProductList()  {
+    
+    public List<Product> requestProductListQuery(int offset, int limit)  {
         HttpRequest getRequest;
         try {
             getRequest = HttpRequest.newBuilder()
-                    .uri(new URI("http://localhost:8080/product"))
+                    .uri(new URI("http://localhost:8080/product/query?offset=" + offset + "&limit=" + limit)) //get?param1=value1&param2=value2"
                     .GET().build();
         } catch (URISyntaxException e) {
             throw new RuntimeException(e);

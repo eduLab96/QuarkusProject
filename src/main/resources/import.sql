@@ -9,4 +9,7 @@
 -- INSERT INTO MyEntity (id) VALUES (2);
 -- INSERT INTO Product (id, name, description) VALUES (1, 'name1', 'desc1');
 -- INSERT INTO Product (id, name, description) VALUES (2, 'name2', 'desc2');
-INSERT INTO Product (name, description) VALUES ('name1', 'desc1');
+INSERT INTO Product (name, description, isAvaliable) VALUES ('name1', 'desc1', true);
+INSERT INTO Product (name, description, isAvaliable) VALUES ('name2', 'desc2',true);
+INSERT INTO Product (name, description, isAvaliable) VALUES ('name3', 'desc3',false);
+INSERT INTO Product (name, description, isAvaliable) VALUES ('name4', 'desc4',false);
