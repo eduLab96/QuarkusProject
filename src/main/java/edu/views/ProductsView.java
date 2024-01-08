@@ -25,7 +25,8 @@ import jakarta.inject.Inject;
 @PageTitle("Products")
 @Route(value = "products", layout = MainLayout.class)
 public class ProductsView extends VerticalLayout {
-
+	
+	@Inject
     ApiRequests api;
     Grid<Product> grid;
     TextField addNameField;
@@ -38,10 +39,7 @@ public class ProductsView extends VerticalLayout {
     Button deleteButton;
     Button cancelButton;
 
-    @Inject
-    public ProductsView(ApiRequests api) {
-
-        this.api = api;
+    public ProductsView() {
         
         //GRID
         createGrid();
@@ -134,8 +132,6 @@ public class ProductsView extends VerticalLayout {
 	    dialog.open();
     	
     }
-
-   
     
     private void loadGrid() {
     	grid.setItems(query -> 
